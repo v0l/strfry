@@ -29,6 +29,8 @@ config:
     default: ""
   - name: relay__info__icon
     desc: "NIP-11: URL pointing to an image to be used as an icon for the relay"
+  - name: relay__webroot
+    desc: "Instead of the default landing page, serve files from a specific dir"
     default: ""
 
   - name: relay__maxWebsocketPayloadSize
