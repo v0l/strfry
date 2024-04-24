@@ -146,6 +146,7 @@ void RelayServer::runWebsocket(ThreadPool<MsgWebsocket>::Thread &thr) {
                     file.read(buffer, bufferSize);
                     res->write(buffer, file.gcount());
                 }
+                file.close();
             }
         } else {
             writeStatusCode(res, 404);
