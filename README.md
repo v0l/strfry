@@ -29,11 +29,22 @@ Either the full set of messages in the DB can be synced, or the results of one o
 
 A C++20 compiler is required, along with a few other common dependencies. On Debian/Ubuntu use these commands:
 
-    sudo apt install -y git build-essential libyaml-perl libtemplate-perl libregexp-grammars-perl libssl-dev zlib1g-dev liblmdb-dev libflatbuffers-dev libsecp256k1-dev libzstd-dev
+#### Linux
+
+    sudo apt install -y git g++ make libssl-dev zlib1g-dev liblmdb-dev libflatbuffers-dev libsecp256k1-dev libzstd-dev
     git clone https://github.com/hoytech/strfry && cd strfry/
     git submodule update --init
     make setup-golpe
     make -j4
+
+#### FreeBSD
+
+    pkg install -y gcc gmake cmake git perl5 openssl lmdb flatbuffers libuv libinotify zstr secp256k1 zlib-ng
+    git clone https://github.com/hoytech/strfry && cd strfry/
+    git submodule update --init
+    gmake setup-golpe
+    gmake -j4
+
 
 ### Running a relay
 

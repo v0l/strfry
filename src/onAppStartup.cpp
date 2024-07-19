@@ -24,20 +24,6 @@ static void dbCheck(lmdb::txn &txn, const std::string &cmd) {
     auto s = env.lookup_Meta(txn, 1);
 
     if (!s) {
-        {
-            // The first version of the DB didn't use a Meta entry -- we consider this version 0
-
-            bool eventFound = false;
-
-            env.foreach_Event(txn, [&](auto &ev){
-                eventFound = true;
-                return false;
-            });
-
-            if (cmd == "export" || cmd == "info") return;
-            if (eventFound) dbTooOld(0);
-        }
-
         env.insert_Meta(txn, CURR_DB_VERSION, 1);
         return;
     }
@@ -60,9 +46,22 @@ static void setRLimits() {
 
     if (getrlimit(RLIMIT_NOFILE, &curr)) throw herr("couldn't call getrlimit: ", strerror(errno));
 
+#ifdef __FreeBSD__
+    LI << "getrlimit NOFILES limit current " <<  curr.rlim_cur << " with max of " <<  curr.rlim_max;
+    if (cfg().relay__nofiles > curr.rlim_max) {
+        LI << "Unable to set NOFILES limit to " << cfg().relay__nofiles << ", exceeds max of " << curr.rlim_max;
+        if (curr.rlim_cur < curr.rlim_max) {
+            LI << "Setting NOFILES limit to max of " << curr.rlim_max;
+            curr.rlim_cur = curr.rlim_max;
+        }
+    }
+    else curr.rlim_cur = cfg().relay__nofiles;
+    LI << "setrlimit NOFILES limit to " <<  curr.rlim_cur;
+#else
     if (cfg().relay__nofiles > curr.rlim_max) throw herr("Unable to set NOFILES limit to ", cfg().relay__nofiles, ", exceeds max of ", curr.rlim_max);
 
     curr.rlim_cur = cfg().relay__nofiles;
+#endif
 
     if (setrlimit(RLIMIT_NOFILE, &curr)) throw herr("Failed setting NOFILES limit to ", cfg().relay__nofiles, ": ", strerror(errno));
 }

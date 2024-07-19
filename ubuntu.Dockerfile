@@ -3,13 +3,13 @@ ENV TZ=Europe/London
 WORKDIR /build
 RUN apt update && apt install -y --no-install-recommends \
     git g++ make pkg-config libtool ca-certificates \
-    libyaml-perl libtemplate-perl libregexp-grammars-perl libssl-dev zlib1g-dev \
-    liblmdb-dev libflatbuffers-dev libsecp256k1-dev \
-    libzstd-dev
+    libssl-dev zlib1g-dev liblmdb-dev libflatbuffers-dev \
+    libsecp256k1-dev libzstd-dev
 
 COPY . .
 RUN git submodule update --init
 RUN make setup-golpe
+RUN make clean
 RUN make -j4
 
 FROM ubuntu:jammy as runner
