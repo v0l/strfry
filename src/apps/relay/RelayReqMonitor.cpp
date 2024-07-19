@@ -42,6 +42,8 @@ void RelayServer::runReqMonitor(ThreadPool<MsgReqMonitor>::Thread &thr) {
 
                 if (!monitors.addSub(txn, std::move(msg->sub), latestEventId)) {
                     sendNoticeError(connId, std::string("too many concurrent REQs"));
+                    // drop connection if spamming requests
+                    monitors.closeConn(connId);
                 }
             } else if (auto msg = std::get_if<MsgReqMonitor::RemoveSub>(&newMsg.msg)) {
                 monitors.removeSub(msg->connId, msg->subId);
